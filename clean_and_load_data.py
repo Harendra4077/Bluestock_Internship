@@ -1,3 +1,7 @@
+"""
+Data cleaning and loading script for Bluestock Mutual Fund Analytics
+Cleans raw data files and loads them into a SQLite database
+"""
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine, text
@@ -7,6 +11,9 @@ os.makedirs("data/processed", exist_ok=True)
 
 
 def clean_nav_history():
+    """
+    Cleans the NAV history file by converting dates, sorting, removing duplicates and invalid NAVs
+    """
     df = pd.read_csv("data/raw/02_nav_history.csv")
     df["date"] = pd.to_datetime(df["date"])
     df = df.sort_values(["amfi_code", "date"])
@@ -19,6 +26,9 @@ def clean_nav_history():
 
 
 def clean_investor_transactions():
+    """
+    Cleans investor transaction data by standardizing transaction types and filtering invalid amounts
+    """
     df = pd.read_csv("data/raw/08_investor_transactions.csv")
     df["transaction_date"] = pd.to_datetime(df["transaction_date"])
     df["transaction_type"] = df["transaction_type"].replace({
@@ -34,6 +44,9 @@ def clean_investor_transactions():
 
 
 def clean_scheme_performance():
+    """
+    Cleans scheme performance data by standardizing return columns and filtering expense ratios
+    """
     df = pd.read_csv("data/raw/07_scheme_performance.csv")
     return_cols = ["return_1yr_pct", "return_3yr_pct", "return_5yr_pct"]
     for col in return_cols:
@@ -46,6 +59,9 @@ def clean_scheme_performance():
 
 
 def clean_other_files():
+    """
+    Copies remaining raw data files directly to processed directory without cleaning
+    """
     file_mapping = {
         "01_fund_master.csv": "fund_master.csv",
         "03_aum_by_fund_house.csv": "aum_by_fund_house.csv",
@@ -63,6 +79,9 @@ def clean_other_files():
 
 
 def create_database_schema(engine):
+    """
+    Creates the SQLite database schema with all required tables
+    """
     schema_sql = """
     CREATE TABLE IF NOT EXISTS dim_fund (
         amfi_code INTEGER PRIMARY KEY,
@@ -155,6 +174,9 @@ def create_database_schema(engine):
 
 
 def load_data_to_sqlite(engine):
+    """
+    Loads all cleaned data files into the SQLite database tables
+    """
     fund_master = pd.read_csv("data/processed/fund_master.csv")
     fund_master.to_sql("dim_fund", engine, if_exists="replace", index=False)
 
@@ -195,6 +217,9 @@ def load_data_to_sqlite(engine):
 
 
 def main():
+    """
+    Main function to run all data cleaning and database loading steps
+    """
     print("Starting data cleaning process...")
     clean_nav_history()
     clean_investor_transactions()
@@ -207,7 +232,7 @@ def main():
     create_database_schema(engine)
     load_data_to_sqlite(engine)
 
-    print("\n✅ Data cleaning and database loading complete!")
+    print("\nData cleaning and database loading complete!")
 
 
 if __name__ == "__main__":
