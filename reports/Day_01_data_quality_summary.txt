@@ -1,0 +1,27 @@
+DATA QUALITY SUMMARY
+
+1. fund_master.csv
+
+* Dataset contains 40 records and 15 columns.
+* No duplicate records found.
+* No missing AMFI codes detected.
+* Fund houses, categories, sub-categories, and risk categories are properly populated.
+* AMFI code validation passed successfully.
+
+2. nav_history.csv
+
+* AMFI code mapping validated against fund_master.csv.
+* No missing scheme codes found.
+* Date column should be converted to datetime format before analysis (if not already converted).
+* NAV column should be verified as numeric/float datatype.
+
+3. returns.csv
+
+* Checked for missing values and duplicate records.
+* Datatypes should be validated before analysis.
+
+Overall Assessment:
+
+* Data quality is good and suitable for further analysis.
+* Dataset consistency checks passed successfully.
+* Minor preprocessing such as datatype conversion and validation may be required before performing analytics and visualization.

@@ -2,10 +2,10 @@ import requests
 import pandas as pd
 import os
 
-# Create raw folder if it doesn't exist
 os.makedirs("data/raw", exist_ok=True)
 
 scheme_codes = {
+    "HDFC_Top100": 125497,
     "SBI_Bluechip": 119551,
     "ICICI_Bluechip": 120503,
     "Nippon_LargeCap": 118632,
@@ -14,23 +14,16 @@ scheme_codes = {
 }
 
 for name, code in scheme_codes.items():
-
+    print(f"Fetching NAV for {name} (scheme code: {code})")
     url = f"https://api.mfapi.in/mf/{code}"
-
     response = requests.get(url)
-
     data = response.json()
-
-    df = pd.read_csv("data/raw/fund_master.csv")
-
-    df.to_csv(
-        f"data/raw/{name}.csv",
-        index=False
-    )
-
     
-    print(df["fund_house"].unique())
-    print(df["category"].unique())
-    print(df["subcategory"].unique())
-    print(df["risk_grade"].unique())
-    print(df["fund_house"].value_counts())
+    if "data" in data:
+        nav_history = data["data"]
+        df = pd.DataFrame(nav_history)
+        output_path = f"data/raw/{name}.csv"
+        df.to_csv(output_path, index=False)
+        print(f"Successfully saved to {output_path}")
+    else:
+        print(f"Error fetching data for {name}")
